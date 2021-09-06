@@ -1,63 +1,81 @@
-/* File create.c */
+  /* File create.c */
 
-#include "header.h"
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/ipc.h>
-#include <sys/sem.h>
-#include <sys/shm.h>
-#include <sys/types.h>
+#include <stdio.h>
 #include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/sem.h>
+#include "header.h"
 
-int main() {
-  int i, id;
-  struct StudentInfo *infoptr;
+int main()
+{
+  int i,id;
+  struct StudentInfo (*students)[NUM_STUDENTS];
   int sema_set;
 
-  id = shmget(KEY, SEGSIZE,
-              IPC_CREAT | 0666); /* get shared memory to store data*/
-  if (id < 0) {
+  id = shmget(KEY, SEGSIZE,IPC_CREAT|0666);/* get shared memory to store data*/
+  if (id <0){
     perror("create: shmget failed");
     exit(1);
-  }
+}
 
-  infoptr =
-      (struct StudentInfo *)shmat(id, 0, 0); /*attach the shared memory segment
-                                      to the process's address space */
-  if (infoptr <= (struct StudentInfo *)(0)) {
+
+  students=(struct StudentInfo * )shmat(id,0,0);/*attach the shared memory segment
+				       to the process's address space */
+  if (students <= (struct StudentInfo *) (0)) {
     perror("create: shmat failed");
     exit(2);
-  }
+}
 
   sema_set = GetSemaphs(SEMA_KEY, NUM_SEMAPHS); /* get a set of NUM_SEMAPHS
-                                                   semaphores*/
-  if ((sema_set < 0)) {
+						   semaphores*/
+  if ((sema_set < 0) ){
     perror("create: semget failed");
     exit(2);
   }
+  
+/* store data in the shared memory segment */  
+  // strcpy(infoptr->fName,"Joe");
+  // strcpy(infoptr->lName, "Smith");
+  // strcpy(infoptr->telNumber, "606-111-2222");
+  // strcpy(infoptr->whoModified, " ");
 
-  /* store data in the shared memory segment */
-  strcpy(infoptr->fName, "Joe");
-  strcpy(infoptr->lName, "Smith");
-  strcpy(infoptr->telNumber, "606-111-2222");
-  strcpy(infoptr->whoModified, " ");
+  FILE *fp;
+  char line[256];
+  fp = fopen("input.txt","r");
+  for (int i=0;i<NUM_STUDENTS;i++){
 
-  /*print the contents of the shared memory segment 10 times*/
+    //read information of student from file into the array in shared memory
+    fgets(&line, 256, fp);
+    strcpy((*students)[i].name,line);
+    fgets(&line, 256, fp);
+    strcpy((*students)[i].id,line);
+    fgets(&line, 256, fp);
+    strcpy((*students)[i].address,line);
+    fgets(&line, 256, fp);
+    strcpy((*students)[i].phone,line);
 
-  for (i = 0; i < 10; i++) {
-    printf("the value of sema_set=%d\n", sema_set);
-    Wait(sema_set, 1);
-    printf("Name: %s %s\nPhone Number: %s\n", infoptr->fName, infoptr->lName,
-           infoptr->telNumber);
-    printf("Last modified by: %s\n \n ", infoptr->whoModified);
-    sleep(2);
-    Signal(sema_set, 1);
+  }
+ 
+  int a =1;
+/*print the contents of the shared memory segment 10 times*/ 
+
+  for(i=0;i<10;i++)
+    {
+      // printf("the value of sema_set=%d\n", sema_set);
+      // Wait(sema_set,1); 
+      // printf("Name: %s %s\nPhone Number: %s\n",
+	    //  infoptr->fName,infoptr->lName,infoptr->telNumber);
+      // printf("Last modified by: %s\n \n ", infoptr->whoModified);
+      // sleep(2);
+      // Signal(sema_set,1);
   }
 
-  shmdt((char *)infoptr); /* detach the shared memory segment */
-  shmctl(id, IPC_RMID,
-         (struct shmid_ds *)0);  /* destroy the shared memory segment*/
-  semctl(sema_set, 0, IPC_RMID); /*Remove the semaphore set */
+  shmdt((char  *)students); /* detach the shared memory segment */
+  shmctl(id, IPC_RMID,(struct shmid_ds *)0); /* destroy the shared memory segment*/
+  semctl(sema_set,0,IPC_RMID); /*Remove the semaphore set */
   exit(0);
 }
