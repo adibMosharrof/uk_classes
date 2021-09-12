@@ -18,6 +18,14 @@ struct StudentInfo{
   int is_removed;
 };
 
+struct SharedMemory{
+  struct StudentInfo* students;
+  int* read_count;
+};
+
 void Wait(int semaph, int n);
 void Signal(int semaph, int n);
 int GetSemaphs(key_t k, int n);
+void GetSharedMemory(struct StudentInfo* students_ptr, int* read_count_ptr);
+// struct SharedMemory* GetSharedMemory(struct StudentInfo* students_ptr, int* read_count_ptr);
+void DisplayStudent(struct StudentInfo* students_ptr);

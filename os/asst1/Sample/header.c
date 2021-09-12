@@ -33,12 +33,17 @@ void Signal(int semaph, int n)
 int GetSemaphs(key_t k, int n)
 {
   int semid, i;
-
   /* get a set of n semaphores with the given key k */
-  
   if ((semid=semget(k,n,IPC_CREAT|0666))!= -1){
     for (i=0;i<n;i++)
       Signal(semid,i); /* unlock all the semaphores */
   }
   return semid;
+}
+
+void DisplayStudent(struct StudentInfo* students_ptr){
+  printf("Name %s\n", students_ptr->name);
+  printf("Id %s\n", students_ptr->id);
+  printf("Address %s\n", students_ptr->address);
+  printf("Phone %s\n", students_ptr->phone);
 }

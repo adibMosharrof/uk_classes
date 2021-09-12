@@ -34,8 +34,8 @@ int main()
     exit(2);
 }
 
-  sema_set = GetSemaphs(SEMA_KEY, NUM_SEMAPHS); /* get a set of NUM_SEMAPHS
-						   semaphores*/
+  sema_set=semget(SEMA_KEY, 0,0);
+  // sema_set = GetSemaphs(SEMA_KEY, NUM_SEMAPHS); /* get a set of NUM_SEMAPHS semaphores*/
   if ((sema_set < 0) ){
     perror("create: semget failed");
     exit(2);

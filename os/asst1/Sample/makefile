@@ -1,16 +1,16 @@
 
 
-all: load change del print query
+all: Load Change Clean Print Query
 
-load: load.c header.h
-	gcc -g -Wall -o load load.c header.c
-change: change.c header.h
-	gcc -g -Wall -o change change.c header.c
-del: clean.c header.h
-	gcc -g -Wall -o del clean.c header.c
-print: print.c header.h
-	gcc -g -Wall -o print print.c header.c
-query: query.c header.h
-	gcc -g -Wall -o query query.c header.c
+Load: load.c header.h
+	gcc -g -Wall -o Load load.c header.c
+Change: change.c header.h
+	gcc -g -Wall -o Change change.c header.c
+Clean: clean.c header.h
+	gcc -g -Wall -o Clean clean.c header.c
+Print: print.c header.h
+	gcc -g -Wall -o Print print.c header.c
+Query: query.c header.h
+	gcc -g -Wall -o Query query.c header.c
 clean:
-	rm -f create  change del print query *~ core
+	rm -f Create  Change Change Print Query *~ core

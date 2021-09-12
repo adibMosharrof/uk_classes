@@ -42,8 +42,8 @@ int main(int argc, char* argv[])
     exit(2);
 }
 
-  sema_set = GetSemaphs(SEMA_KEY, NUM_SEMAPHS); /* get a set of NUM_SEMAPHS
-						   semaphores*/
+sema_set=semget(SEMA_KEY, 0,0);
+  // sema_set = GetSemaphs(SEMA_KEY, NUM_SEMAPHS); /* get a set of NUM_SEMAPHS semaphores*/
   if ((sema_set < 0) ){
     perror("create: semget failed");
     exit(2);
@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
       printf("Not a valid action entered\n");
       exit(0);
     }
-  
+  Wait(sema_set,0);  
   switch (action){
     case 1:
       if (verify_password() ==0){
@@ -72,7 +72,8 @@ int main(int argc, char* argv[])
       printf("Enter Student address \n");
       scanf("%s", &student_address);
 
-      Wait(sema_set,0); 
+      // Wait(sema_set,0); 
+      printf("the value of sema_set=%d\n", sema_set); 
       found =0;
       while(strcmp(ptr->name, "") !=0){
         ptr++;    
@@ -83,6 +84,8 @@ int main(int argc, char* argv[])
       strcpy(ptr->phone,student_phone);
       strcpy(ptr->address,student_address);
       printf("Added student %s\n", student_name);
+      sleep(10);
+      printf("Done Sleep in add\n");
       Signal(sema_set,0);
       break;
     case 2:      
@@ -91,7 +94,7 @@ int main(int argc, char* argv[])
       }     
       printf("Enter Student id \n");
       scanf("%s", &student_id);
-      Wait(sema_set,0); 
+      // Wait(sema_set,0); 
       found =0;
       while(strcmp(ptr->name, "") !=0){
         if (strcmp(strtok(ptr->id ,"\n"), student_id) == 0 && ptr->is_removed == 0 ){
@@ -115,7 +118,7 @@ int main(int argc, char* argv[])
       }     
       printf("Enter Student id \n");
       scanf("%s", &student_id);
-      Wait(sema_set,0); 
+      // Wait(sema_set,0); 
       found =0;
       while(strcmp(ptr->name, "") !=0){
         if (strcmp(ptr->id, student_id) == 0 && ptr->is_removed == 0 ){
@@ -150,9 +153,9 @@ int main(int argc, char* argv[])
     default:
       break;
   }
+  Signal(sema_set,0);
   }
   
-Signal(sema_set,0);
 }
 
 void display_menu(){
@@ -167,7 +170,7 @@ int verify_password(){
   printf("Enter Password \n");
   scanf("%s", &password);
   if (strcmp("000", password) !=0){
-    printf("Incorrect Password");
+    printf("Incorrect Password\n");
     return 0;
   }
   return 1;

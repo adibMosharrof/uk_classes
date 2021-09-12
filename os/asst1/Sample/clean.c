@@ -32,6 +32,12 @@ int main()
     perror("create: shmat failed");
     exit(2);
   }
+  sema_set=semget(SEMA_KEY, 0,0);
+  if ((sema_set < 0) ){
+    perror("create: semget failed");
+    exit(2);
+  }
+  
   verify_password();
   Wait(sema_set,0); 
   FILE *fp;
