@@ -17,6 +17,7 @@ int main()
   int sema_set;
   int* read_count;
   int found = 0;
+  char student_id[50];
 
   id = shmget(KEY, SEGSIZE,0);/* get shared memory to store data*/
   read_count_id = shmget(RC_KEY, READCOUNT_SEGSIZE, 0);/* get shared memory to store data*/
@@ -45,10 +46,12 @@ int main()
   Signal(sema_set,1);
 
   found =0;
+  printf("Enter Student id to query \n");
+  scanf("%s", &student_id);
   // looping through the student array
   while(strcmp(students_ptr->name, "") !=0){
     // filtering to find the student with the id provided... also skipping deleted items
-    if (strcmp(strtok(students_ptr->id ,"\n"),argv[1]) == 0 && students_ptr->is_removed == 0 ){
+    if (strcmp(strtok(students_ptr->id ,"\n"),student_id) == 0 && students_ptr->is_removed == 0 ){
       sleep(2);
       DisplayStudent(students_ptr);
       found = 1;

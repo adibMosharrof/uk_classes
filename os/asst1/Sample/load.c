@@ -43,7 +43,6 @@ int main()
   fp = fopen("input.txt","r");
   // initializing read count to zero
   *read_count = 0;
-  tmp = ptr;
   while(!feof(fp)){
     fgets(&line, 100, fp);
     strcpy(ptr->name,strtok(line,"\n"));
