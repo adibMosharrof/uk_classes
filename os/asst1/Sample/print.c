@@ -13,8 +13,7 @@
 int main()
 {
   int i,id, read_count_id;
-  struct StudentInfo (*students)[NUM_STUDENTS];
-  struct StudentInfo *ptr, *tmp;
+  struct StudentInfo *ptr;
   int sema_set;
   int* read_count;
   
@@ -25,10 +24,9 @@ int main()
     perror("create: shmget failed");
     exit(1);
 }
-  // students=(struct StudentInfo * )shmat(id,0,0);/*attach the shared memory segment to the process's address space */
   ptr=(struct StudentInfo * )shmat(id,0,0);/*attach the shared memory segment to the process's address space */
   read_count=(int * )shmat(read_count_id,0,0);/*attach the shared memory segment to the process's address space */
-  // if (students <= (struct StudentInfo *) (0) || read_count <= (int *) (0)) {
+  //checking to see if the memory locations are valid
   if (ptr <= (struct StudentInfo *) (0) || read_count <= (int *) (0)) {
     perror("create: shmat failed");
     exit(2);

@@ -15,8 +15,7 @@
 int main(int argc, char* argv[])
 {
  int i,id, read_count_id;
-  struct StudentInfo (*students)[NUM_STUDENTS];
-  struct StudentInfo *ptr, *tmp;
+  struct StudentInfo *ptr;
   int sema_set;
   int* read_count;
   char student_id[50];
@@ -33,17 +32,14 @@ int main(int argc, char* argv[])
     perror("create: shmget failed");
     exit(1);
 }
-  // students=(struct StudentInfo * )shmat(id,0,0);/*attach the shared memory segment to the process's address space */
   ptr=(struct StudentInfo * )shmat(id,0,0);/*attach the shared memory segment to the process's address space */
   read_count=(int * )shmat(read_count_id,0,0);/*attach the shared memory segment to the process's address space */
-  // if (students <= (struct StudentInfo *) (0) || read_count <= (int *) (0)) {
   if (ptr <= (struct StudentInfo *) (0) || read_count <= (int *) (0)) {
     perror("create: shmat failed");
     exit(2);
 }
 
 sema_set=semget(SEMA_KEY, 0,0);
-  // sema_set = GetSemaphs(SEMA_KEY, NUM_SEMAPHS); /* get a set of NUM_SEMAPHS semaphores*/
   if ((sema_set < 0) ){
     perror("create: semget failed");
     exit(2);
@@ -75,6 +71,7 @@ sema_set=semget(SEMA_KEY, 0,0);
       // Wait(sema_set,0); 
       printf("the value of sema_set=%d\n", sema_set); 
       found =0;
+      // looping to the end of the student array to find the position to enter the new record
       while(strcmp(ptr->name, "") !=0){
         ptr++;    
       }
@@ -84,7 +81,7 @@ sema_set=semget(SEMA_KEY, 0,0);
       strcpy(ptr->phone,student_phone);
       strcpy(ptr->address,student_address);
       printf("Added student %s\n", student_name);
-      sleep(10);
+      sleep(2);
       printf("Done Sleep in add\n");
       Signal(sema_set,0);
       break;
@@ -96,9 +93,14 @@ sema_set=semget(SEMA_KEY, 0,0);
       scanf("%s", &student_id);
       // Wait(sema_set,0); 
       found =0;
+      //looping over the student array to find the student to delete
       while(strcmp(ptr->name, "") !=0){
+        //filtering by student id and checking whether the student has been deleted
         if (strcmp(strtok(ptr->id ,"\n"), student_id) == 0 && ptr->is_removed == 0 ){
           found = 1;
+          //setting is removed to 1, which means the student is deleted and will not be read in the future
+          // not actually deleting the record from memory, as it might create problems with looping
+          // through the student array, as we are storing data as an array in the shared memory.
           ptr->is_removed =1;
           printf("Deleted student with id %s\n", student_id);
           break;
@@ -120,7 +122,9 @@ sema_set=semget(SEMA_KEY, 0,0);
       scanf("%s", &student_id);
       // Wait(sema_set,0); 
       found =0;
+      //looping over the student array to find the student to update
       while(strcmp(ptr->name, "") !=0){
+        //filtering by student id and checking whether the student has been deleted
         if (strcmp(ptr->id, student_id) == 0 && ptr->is_removed == 0 ){
           found = 1;
           printf("Record Found\n");
@@ -130,6 +134,7 @@ sema_set=semget(SEMA_KEY, 0,0);
           scanf("%s", &student_phone);
           printf("Enter Address\n");
           scanf("%s", &student_address);
+          //updating student information
           if (strcmp(student_name, "") != 0){
             strcpy(ptr->name,student_name);
           }

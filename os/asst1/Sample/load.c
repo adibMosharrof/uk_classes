@@ -9,36 +9,27 @@
 #include <sys/shm.h>
 #include <sys/sem.h>
 #include "header.h"
-/*
-425987
-458756
-491525
-*/
+
 int main()
 {
   int i,id, read_count_id;
-  // struct StudentInfo (*students)[NUM_STUDENTS];
-  struct StudentInfo *ptr, *tmp;
+  struct StudentInfo *ptr;
   int sema_set;
   int* read_count;
-  
 
   id = shmget(KEY, SEGSIZE,IPC_CREAT|0666);/* get shared memory to store data*/
   read_count_id = shmget(RC_KEY, READCOUNT_SEGSIZE, IPC_CREAT|0666);/* get shared memory to store data*/
   if (id <0 || read_count_id <0){
     perror("create: shmget failed");
     exit(1);
-}
+  }
 
-
-  // students=(struct StudentInfo * )shmat(id,0,0);/*attach the shared memory segment to the process's address space */
   ptr=(struct StudentInfo * )shmat(id,0,0);/*attach the shared memory segment to the process's address space */
   read_count=(int * )shmat(read_count_id,0,0);/*attach the shared memory segment to the process's address space */
-  // if (students <= (struct StudentInfo *) (0) || read_count <= (int *) (0)) {
   if (ptr <= (struct StudentInfo *) (0) || read_count <= (int *) (0)) {
     perror("create: shmat failed");
     exit(2);
-}
+  }
 
   sema_set = GetSemaphs(SEMA_KEY, NUM_SEMAPHS); /* get a set of NUM_SEMAPHS semaphores*/
   if ((sema_set < 0) ){
@@ -54,7 +45,6 @@ int main()
   *read_count = 0;
   tmp = ptr;
   while(!feof(fp)){
-//strtok(ptr->id ,"\n")
     fgets(&line, 100, fp);
     strcpy(ptr->name,strtok(line,"\n"));
     fgets(&line, 50, fp);
@@ -65,14 +55,9 @@ int main()
     strcpy(ptr->phone,strtok(line,"\n"));
     ptr->is_removed = 0;
     ptr++;
-    // sleep(2);
-    
   }
-
   fclose(fp);
   printf("Loaded student information into shared memory\n");
   Signal(sema_set,0);
-  
-
 }
 
