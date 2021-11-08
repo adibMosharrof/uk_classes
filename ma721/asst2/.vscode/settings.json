@@ -1,0 +1,11 @@
+{
+	"files.exclude": {
+		"**/flower_photos": false,
+	},
+	"files.watcherExclude": {
+		"**/flower_photos": true,
+	},
+	"search.exclude": {
+		"**/flower_photos": true,
+	}
+}

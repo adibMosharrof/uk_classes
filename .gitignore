@@ -50,3 +50,9 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+**/envs/
+**/lightning_logs/
+**/mlruns/
+**__pycache__/
+ma721/asst2/flower_photos/
